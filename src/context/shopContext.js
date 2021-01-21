@@ -10,20 +10,26 @@ const client = Client.buildClient({
 
 export default function ShopProvider({ children }) {
   const [checkout, setCheckout] = React.useState();
+  const [product, setProduct] = React.useState();
+  const [products, setProducts] = React.useState();
 
   const createCheckout = React.useCallback(async () => {
     const checkout = await client.checkout.create();
-    localStorage.setItem("checkout-id", checkout.id);
+    localStorage.setItem("checkout_id", checkout.id);
     console.log(checkout);
     setCheckout(checkout);
-    // setState({ checkout, ...state });
   }, []);
 
   React.useEffect(() => {
-    createCheckout();
+    localStorage.checkout_id
+      ? fetchCheckout(localStorage.checkout_id)
+      : createCheckout();
   }, [createCheckout]);
 
-  const fetchCheckout = async () => {};
+  const fetchCheckout = async (checkout_id) => {
+    const checkout = client.checkout.fetch(checkout_id);
+    setCheckout(checkout);
+  };
 
   const addItemToCheckout = async () => {};
 
@@ -31,10 +37,12 @@ export default function ShopProvider({ children }) {
 
   const fetchAllProducts = async () => {
     const products = await client.product.fetchAll();
+    setProducts(products);
   };
 
   const fetchProductWithHandle = async (handle) => {
     const product = await client.product.fetchByHandle(handle);
+    setProduct(product);
   };
 
   const closeCart = () => {};
@@ -45,9 +53,25 @@ export default function ShopProvider({ children }) {
 
   const closeMenu = () => {};
 
-  console.log("state", checkout);
-
-  return <ShopContext.Provider>{children}</ShopContext.Provider>;
+  return (
+    <ShopContext.Provider
+      value={{
+        checkout,
+        product,
+        products,
+        fetchAllProducts: fetchAllProducts,
+        fetchProductWithHandle,
+        addItemToCheckout: addItemToCheckout,
+        closeCart: closeCart,
+        closeMenu: closeMenu,
+        openCart: openCart,
+        openMenu: openMenu,
+        removeLineItem: removeLineItem,
+      }}
+    >
+      {children}
+    </ShopContext.Provider>
+  );
 }
 
 const ShopConsumer = ShopContext.Consumer;
