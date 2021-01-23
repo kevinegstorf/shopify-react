@@ -1,5 +1,6 @@
 import { ShopContext } from "../context/shopContext";
 import { useCallback, useContext, useEffect } from "react";
+import { Box, Grid, Text, Image } from "@chakra-ui/react";
 import { Link } from "react-router-dom";
 
 export default function HomePage() {
@@ -16,17 +17,20 @@ export default function HomePage() {
   if (!products) return <div>...loading</div>;
 
   return (
-    <div>
-      {products.map((product) => {
-        console.log(product);
-        return (
-          <div key={product.id}>
-            <Link to={`/product/${product.handle}`}>
-              <h1>{product.title}</h1>
+    <Box>
+      <Grid templateColumns="repeat(3, 1fr)">
+        {products.map(({ id, handle, name, images, title, variants }) => {
+          return (
+            <Link key={id} to={`/product/${handle}`}>
+              <Box _hover={{ opacity: "80%" }}>
+                <Image alt={name} src={images[0].src} />
+                <Text>{title}</Text>
+                <Text>€{variants[0].price}</Text>
+              </Box>
             </Link>
-          </div>
-        );
-      })}
-    </div>
+          );
+        })}
+      </Grid>
+    </Box>
   );
 }
