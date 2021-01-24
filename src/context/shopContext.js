@@ -13,11 +13,11 @@ export default function ShopProvider({ children }) {
   const [product, setProduct] = React.useState();
   const [products, setProducts] = React.useState();
   const [isCartOpen, setIsCartOpen] = React.useState();
+  const [isMenuOpen, setIsMenuOpen] = React.useState(false);
 
   const createCheckout = React.useCallback(async () => {
     const checkout = await client.checkout.create();
     localStorage.setItem("checkout_id", checkout.id);
-    console.log(checkout);
     setCheckout(checkout);
   }, []);
 
@@ -26,32 +26,30 @@ export default function ShopProvider({ children }) {
       ? fetchCheckout(localStorage.checkout_id)
       : createCheckout();
     setCheckout(localStorage.checkout_id);
-  }, [createCheckout]);
+    console.log(checkout);
+  }, []);
 
   const fetchCheckout = async (checkout_id) => {
-    const checkout = client.checkout.fetch(checkout_id);
+    const checkout = await client.checkout.fetch(checkout_id);
     setCheckout(checkout);
   };
 
-  const test = (variantId, quantity) => {
-    const addItemToCheckout = async (variantId, quantity) => {
-      const lineItemsToAdd = [
-        {
-          variantId,
-          quantity: parseInt(quantity, 10),
-        },
-      ];
+  // const addItemToCheckout = async (variantId, quantity) => {
+  //   const lineItemsToAdd = [
+  //     {
+  //       variantId,
+  //       quantity: parseInt(quantity, 10),
+  //     },
+  //   ];
 
-      const sendCheckout = await client.checkout.addLineItems(
-        checkout.id,
-        lineItemsToAdd
-      );
+  //   const sendCheckout = await client.checkout.addLineItems(
+  //     checkout.id,
+  //     lineItemsToAdd
+  //   );
 
-      setCheckout(sendCheckout);
-      setIsCartOpen(true);
-    };
-    addItemToCheckout(variantId, quantity);
-  };
+  //   setCheckout(sendCheckout);
+  //   setIsCartOpen(true);
+  // };
 
   const removeLineItem = async (ids) => {};
 
@@ -71,31 +69,35 @@ export default function ShopProvider({ children }) {
 
   const openCart = () => {
     setIsCartOpen(!isCartOpen);
-
-    console.log(isCartOpen);
   };
 
-  const openMenu = () => {};
+  const openMenu = () => {
+    setIsMenuOpen(!isMenuOpen);
+  };
 
-  const closeMenu = () => {};
-
+  const closeMenu = () => {
+    setIsMenuOpen(!isMenuOpen);
+  };
+  console.log("from Context", checkout);
   return (
     <ShopContext.Provider
       value={
         (fetchProductWithHandle,
         openCart,
-        test,
         {
           checkout,
+          setCheckout,
           product,
           products,
           fetchAllProducts: fetchAllProducts,
           closeCart: closeCart,
-          closeMenu: closeMenu,
           openCart: openCart,
           openMenu: openMenu,
           removeLineItem: removeLineItem,
           isCartOpen,
+          isMenuOpen,
+          closeMenu,
+          client,
         })
       }
     >
