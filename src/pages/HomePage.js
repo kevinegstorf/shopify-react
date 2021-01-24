@@ -2,6 +2,7 @@ import { ShopContext } from "../context/shopContext";
 import { useCallback, useContext, useEffect } from "react";
 import { Box, Grid, Text, Image } from "@chakra-ui/react";
 import { Link } from "react-router-dom";
+import Hero from "../components/Hero";
 
 export default function HomePage() {
   const { fetchAllProducts, products } = useContext(ShopContext);
@@ -11,14 +12,14 @@ export default function HomePage() {
   ]);
   useEffect(() => {
     getAllProducts();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [null]);
+  }, []);
 
   if (!products) return <div>...loading</div>;
 
   return (
     <Box>
-      <Grid templateColumns="repeat(3, 1fr)">
+      <Hero />
+      <Grid templateColumns={["repeat(1, 1fr)", "repeat(3, 1fr)"]}>
         {products.map(({ id, handle, name, images, title, variants }) => {
           return (
             <Link key={id} to={`/product/${handle}`}>
